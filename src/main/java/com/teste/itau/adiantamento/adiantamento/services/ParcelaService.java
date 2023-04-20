@@ -21,7 +21,7 @@ public class ParcelaService {
 
         if (parcelas != null) {
 
-            if (parcelaDTO.getNumParcelas() > parcelas.getQtdParcelas()) {
+            if (parcelaDTO.getNumParcelas() < parcelas.getQtdParcelas()) {
                 throw new ParcelaException("Numero de parcelas menor que atual");
             }
 
