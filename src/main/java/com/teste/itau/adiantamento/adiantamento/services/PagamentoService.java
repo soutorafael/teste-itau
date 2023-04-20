@@ -3,6 +3,7 @@ package com.teste.itau.adiantamento.adiantamento.services;
 import com.teste.itau.adiantamento.adiantamento.dto.PagamentoDTO;
 import com.teste.itau.adiantamento.adiantamento.exceptions.PagamentoException;
 import com.teste.itau.adiantamento.adiantamento.model.Pagamento;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -18,10 +19,20 @@ public class PagamentoService {
 
     public Pagamento adiantaPagamento(PagamentoDTO pagDto) throws PagamentoException {
 
-        LocalDate currentDate = LocalDate.now();
-        LocalDate currentDateMinus30Days = currentDate.plusDays(10);
+        try {
+            LocalDate currentDate = LocalDate.now();
+            LocalDate currentDateMinus30Days = currentDate.plusDays(10);
+            LocalDate dataPagamento = pagDto.getDataPagamento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+            validaPagamento(dataPagamento, currentDateMinus30Days, pagDto);
+            alteraParcela(pagDto);
+        } catch (PagamentoException e){
+            throw new PagamentoException(e.getMessage());
+        }
+        return mapPagamentos.get(pagDto.getNumContrato());
+    }
 
-        LocalDate dataPagamento = pagDto.getDataPagamento().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+    private void validaPagamento(LocalDate dataPagamento, LocalDate currentDateMinus30Days, PagamentoDTO pagDto)
+            throws PagamentoException{
         if (dataPagamento.isAfter(currentDateMinus30Days)){
             throw new PagamentoException("Data pagamento após 10 dias de hoje");
         }
@@ -32,14 +43,24 @@ public class PagamentoService {
         if (pagFind.isAtraso()){
             throw new PagamentoException("Contrato atrasado");
         }
-        alteraParcela(pagDto);
-        return mapPagamentos.get(pagDto.getNumContrato());
+        if (!mapPagamentos.containsKey(pagDto.getNumContrato())){
+            throw new PagamentoException("Contrato não existe");
+        }
     }
 
+    /**
+     * Altera a parcela
+     * @param pagDto
+     */
     private void alteraParcela(PagamentoDTO pagDto) {
         mapPagamentos.get(pagDto.getNumContrato()).setDataPagamento(pagDto.getDataPagamento());
     }
 
+    /**
+     * Mock dos pagamentos
+     * @param numContrato
+     * @return
+     */
     private Pagamento getPagamentos(Integer numContrato){
         if (mapPagamentos == null) {
             mapPagamentos = new HashMap<>();

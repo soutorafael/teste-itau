@@ -8,8 +8,6 @@ import lombok.Setter;
 import java.io.Serializable;
 
 @Builder
-@Getter
-@Setter
 @Data
 public class ParcelaDTO implements Serializable {
 

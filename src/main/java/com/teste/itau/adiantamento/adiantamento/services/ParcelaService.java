@@ -16,31 +16,41 @@ public class ParcelaService {
 
     Map<Integer, Parcelas> map = null;
 
-    public Parcelas alterarParcelas(ParcelaDTO parcelaDTO) throws ParcelaException {
-        Parcelas parcelas = getParcela(parcelaDTO.getNumContrato());
-
-        if (parcelas != null) {
-
-            if (parcelaDTO.getNumParcelas() < parcelas.getQtdParcelas()) {
-                throw new ParcelaException("Numero de parcelas menor que atual");
+    public Parcelas alterarParcelas(ParcelaDTO parcelaDTO) {
+        try {
+            Parcelas parcelas = getParcela(parcelaDTO.getNumContrato());
+            if (parcelas != null) {
+                validarParcelas(parcelaDTO, parcelas);
+                BigDecimal valorParcela = parcelas.getValorParcela();
+                Juros juros = getJuros();
+                BigDecimal novaParclea = valorParcela.divide(new BigDecimal(100)).multiply(juros.getTaxa());
+                map.get(parcelaDTO.getNumContrato()).setValorParcela(novaParclea);
+            } else {
+                throw new ParcelaException("Contrato não existe ");
             }
-
-            if (!parcelas.isIsativo()) {
-                throw new ParcelaException("Contrato inativo ");
-            }
-
-            BigDecimal valorParcela = parcelas.getValorParcela();
-            Juros juros = getJuros();
-            BigDecimal novaParclea = valorParcela.divide(new BigDecimal(100)).multiply(juros.getTaxa());
-
-            map.get(parcelaDTO.getNumContrato()).setValorParcela(novaParclea);
-
-        } else {
-            throw new ParcelaException("Contrato não existe ");
+        } catch (ParcelaException e){
+            throw new ParcelaException(e.getMessage());
         }
         return map.get(parcelaDTO.getNumContrato());
     }
 
+    private void validarParcelas(ParcelaDTO parcelaDTO, Parcelas parcelas) throws ParcelaException {
+        if (parcelaDTO.getNumParcelas() < parcelas.getQtdParcelas()) {
+            throw new ParcelaException("Numero de parcelas menor que atual");
+        }
+        if (!parcelas.isIsativo()) {
+            throw new ParcelaException("Contrato inativo ");
+        }
+        if (!map.containsKey(parcelaDTO.getNumContrato())){
+            throw new ParcelaException("Contrato não existe");
+        }
+    }
+
+    /**
+     * Mock Parcelas
+     * @param numContrato
+     * @return
+     */
     private Parcelas getParcela(Integer numContrato){
          if (map == null){
              map = new HashMap<>();
@@ -69,6 +79,10 @@ public class ParcelaService {
          return null;
     }
 
+    /**
+     * Mock chamada feing juros.
+     * @return
+     */
     private Juros getJuros() {
         /**
          *  chama o feing

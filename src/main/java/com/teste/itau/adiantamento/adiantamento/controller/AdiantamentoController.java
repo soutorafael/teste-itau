@@ -24,33 +24,15 @@ public class AdiantamentoController {
     @Autowired
     private ParcelaService parcelaService;
 
+    @ExceptionHandler(PagamentoException.class)
     @RequestMapping(value =  "/adiantamento/pagamento", method = RequestMethod.POST)
-    public ResponseEntity<RetornoPagamentoDTO> pagamento(@RequestBody PagamentoDTO pagamento){
-        ResponseEntity<RetornoPagamentoDTO> responseEntity = null;
-        RetornoPagamentoDTO retornoPagamentoDTO = null;
-        try {
-            Pagamento pagamentoRetorno  = pagamentoService.adiantaPagamento(pagamento);
-            retornoPagamentoDTO = RetornoPagamentoDTO.builder().pagamento(pagamentoRetorno).status(200).build();
-            responseEntity = new ResponseEntity<>(retornoPagamentoDTO, HttpStatus.OK);
-        } catch (PagamentoException e) {
-            retornoPagamentoDTO = RetornoPagamentoDTO.builder().messagem(e.getMessage()).build();
-            responseEntity = new ResponseEntity<>(retornoPagamentoDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return responseEntity;
+    public ResponseEntity<Pagamento> pagamento(@RequestBody PagamentoDTO pagamento){
+        return ResponseEntity.ok().body(pagamentoService.adiantaPagamento(pagamento));
     }
 
+    @ExceptionHandler(ParcelaException.class)
     @RequestMapping(value =  "/adiantamento/parcela", method = RequestMethod.POST)
-    public ResponseEntity<RetornoParcelaDTO> parcela(@RequestBody ParcelaDTO parcelaDTO){
-        ResponseEntity<RetornoParcelaDTO> responseEntity = null;
-        RetornoParcelaDTO retornoParcelaDTO = null;
-        try {
-            Parcelas parcelas = parcelaService.alterarParcelas(parcelaDTO);
-            retornoParcelaDTO = RetornoParcelaDTO.builder().parcela(parcelas).status(200).build();
-            responseEntity = new ResponseEntity<RetornoParcelaDTO>(retornoParcelaDTO, HttpStatus.OK);
-        } catch (ParcelaException e){
-            retornoParcelaDTO = RetornoParcelaDTO.builder().messagem(e.getMessage()).build();
-            responseEntity = new ResponseEntity<RetornoParcelaDTO>( retornoParcelaDTO ,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-        return responseEntity;
+    public ResponseEntity<Parcelas> parcela(@RequestBody ParcelaDTO parcelaDTO){
+        return ResponseEntity.ok().body(parcelaService.alterarParcelas(parcelaDTO));
     }
 }

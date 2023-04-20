@@ -1,16 +1,10 @@
 package com.teste.itau.adiantamento.adiantamento.exceptions;
 
-public class PagamentoException extends BusinessException {
+import org.springframework.http.HttpStatus;
 
-    public PagamentoException(Exception exception) {
-        super(exception);
-    }
+public class PagamentoException extends RuntimeException {
 
-    public PagamentoException(String message, PagamentoException businessException) {
-        super(message, businessException);
-    }
-
-    public PagamentoException(String message) {
+    public PagamentoException(String message){
         super(message);
     }
 }
