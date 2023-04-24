@@ -7,8 +7,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Builder
-@Getter
-@Setter
 @Data
 public class RetornoPagamentoDTO {
 

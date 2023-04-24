@@ -8,8 +8,6 @@ import lombok.Setter;
 
 
 @Builder
-@Getter
-@Setter
 @Data
 public class RetornoParcelaDTO {
 

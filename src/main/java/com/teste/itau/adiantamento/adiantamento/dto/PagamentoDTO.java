@@ -9,8 +9,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 @Builder
-@Getter
-@Setter
 @Data
 public class PagamentoDTO implements Serializable {
 
